@@ -1,14 +1,12 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, render_template, request, redirect, session, url_for, flash 
 import docx
 import PyPDF2
 import requests
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
+import sqlite3
 
-# app = Flask(__name__)
-
-from flask import send_from_directory
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 
@@ -17,10 +15,71 @@ CORS(app, supports_credentials=True)
 CORS(app, resources={r"/*": {"origins": "http://localhost:8000"}})
 CORS(app, origins=["http://localhost:8000"])
 
-@app.route('/')
-def serve_index():
-    return send_from_directory('.', 'home.html')
+load_dotenv()
 
+# For Dev
+# app.secret_key = "adf703e0db6fbd77635a40638ad2018b"  # Needed for session and flash
+# ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
+
+# For Prod
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+ACCESS_TOKEN = os.getenv("GEMINI_API_KEY")
+
+def init_db():
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        )
+    """)
+    # Add a test user (run once)
+    cursor.execute("INSERT OR IGNORE INTO users (email, password) VALUES (?, ?)", 
+                   ("test@example.com", "password123"))
+    conn.commit()
+    conn.close()
+
+
+@app.route('/')
+def index():
+    return render_template('login.html')
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('username', None)  # or session.clear()
+    return '', 204  # No Content
+
+@app.route('/login', methods=['GET'])
+def login_redirect():
+    return render_template('login.html')
+
+@app.route("/login", methods=["POST"])
+def login():
+    email = request.form["email"]
+    password = request.form["password"]
+
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        session["user"] = email  # Store email in session
+        return redirect(url_for("home"))
+    else:
+        flash("Invalid email or password!")
+        return redirect(url_for("index"))
+
+
+@app.route("/home")
+def home():
+    if "user" not in session:
+        flash("You must log in first.")
+        return redirect(url_for("index"))
+    return render_template("home.html", user_email=session["user"])
 
 
 @app.route('/summarize', methods=['POST'])
@@ -40,9 +99,6 @@ def generate_mcq_endpoint():
     return jsonify({'result': result})
 
 
-load_dotenv()
-
-ACCESS_TOKEN = os.getenv("GEMINI_API_KEY")
 
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={ACCESS_TOKEN}"
 
@@ -71,13 +127,15 @@ def summarize_text_from_string(content, word_limit=100, content_type="general"):
         ]
     }
 
-    response = requests.post(API_URL, headers=headers, json=payload)
+    response ='this is the summary of the uploaded file.' #requests.post(API_URL, headers=headers, json=payload)
 
-    if response.status_code == 200:
-        result = response.json()
-        return result['candidates'][0]['content']['parts'][0]['text']
-    else:
-        return f"Error: {response.status_code} - {response.text}"
+    return response
+
+    # if response.status_code == 200:
+    #     result = response.json()
+    #     return result['candidates'][0]['content']['parts'][0]['text']
+    # else:
+    #     return f"Error: {response.status_code} - {response.text}"
 
 @app.route('/summarize_text', methods=['POST'])
 def summarize_text_route():
@@ -121,7 +179,7 @@ def generate_questions_text_route():
     if not content.strip():
         return jsonify({'result': 'Empty content received.'})
 
-    result = generate_questions_from_string(content, complexity, content_type=content_type)
+    result = 'Okay'#generate_questions_from_string(content, complexity, content_type=content_type)
     return jsonify({'result': result})
 
 
@@ -249,10 +307,12 @@ def summarize_text(file, word_limit=100, content_type="general"):
     else:
         return f"Error: {response.status_code} - {response.text}"
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
 # if __name__ == '__main__':
-#     port = int(os.environ.get("PORT", 5000))
-#     app.run(debug=False, host="0.0.0.0", port=port)
+#     init_db()
+#     app.run(debug=True,host="127.0.0.1", port=5000)
+
+
+if __name__ == '__main__':
+    init_db()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host="0.0.0.0", port=port)

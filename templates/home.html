@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Exam Management System</title>
+  <title>Exam Preparation</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>Exam Preparation</header>
+<header>
+  Exam Preparation
+  <i class="fas fa-right-from-bracket" title="Sign Out" onclick="signOut()" style="float:right; cursor:pointer; margin-right: 10px;"></i>
+</header>
+
 <nav>
   <button class="active" onclick="switchTab('summarize')">Summarization</button>
   <button onclick="switchTab('question')">Question Bank</button>
@@ -37,20 +41,17 @@
     <label>Summary Word Limit (min 50, max 50% of content)</label>
     <input type="number" id="summaryLimit" disabled placeholder="e.g. 100" />
   </div>
+  <div class="form-group">
+    <input type="checkbox" id="bulletpoints" name="bulletpoints" value="Summary in Bullet Points">In Bullet points
+  </div>
+
   <button onclick="showSummary()">Summarize</button>
   <div id="loading" class="hidden">
     <div class="spinner"></div> Summarizing...
   </div>
 
-  <!-- <div class="result hidden" id="summaryResult">
-    <button class="copy-btn" onclick="copyToClipboard('summaryText')">Copy</button>
-    <div id="summaryText">
-      
-    </div>
-  </div> -->
 <div id="summaryResult" class="result hidden">
   <h3>Summary</h3>
-  <!-- <pre id="summaryText"></pre> -->
   <div id="summaryText">
       
     </div>
@@ -115,6 +116,19 @@
     });
   });
 
+  function signOut() {
+    fetch('/logout', {
+      method: 'POST'
+    })
+    .then(() => {
+      window.location.href = '/login';
+    })
+    .catch(error => {
+      console.error('Error during logout:', error);
+    });
+  }
+
+
   let fileText = "";
 
   function switchTab(tab) {
@@ -129,6 +143,11 @@
 
   function showSummary() {
   const wordLimit = parseInt(document.getElementById("summaryLimit").value);
+  if (isNaN(wordLimit)) {
+    alert('Non');
+  }
+    
+
   const contentType = document.querySelector('input[type="text"]').value;
   const loading = document.getElementById('loading');
 
