@@ -1,10 +1,17 @@
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f6f9;
+    background-color: #f6f5f7;
     color: #333;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	
 }
+
+
+
 #loading {
   font-weight: bold;
   padding: 1rem;
@@ -28,19 +35,20 @@ body {
 }
 
 header {
-    background-color: #1e88e5;
+    background-color: #FF416C;
     color: white;
     padding: 1rem 2rem;
     text-align: center;
     font-size: 1.8rem;
     font-weight: bold;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 6px rgba(245, 29, 29, 0.2);
 }
 
 nav {
     display: flex;
     justify-content: center;
-    background-color: #a3a1aa;
+    background-color: #FF416C;
+    color: #FF416C;
     border-bottom: 1px solid #ddd;
 }
 
@@ -54,8 +62,8 @@ nav button {
 }
 
 nav button.active {
-    border-bottom: 3px solid #1e88e5;
-    color: #1e88e5;
+    border-bottom: 3px solid #FF416C;
+    color: #09051b;
 }
 
 .container {
@@ -87,16 +95,34 @@ select {
     border: 1px solid #ccc;
 }
 
+
+
 button {
-    padding: 0.7rem 1.5rem;
-    border: none;
-    background-color: #1e88e5;
-    color: white;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 0.5rem;
+	border-radius: 20px;
+	border: 1px solid #FF4B2B;
+	background-color: #FF4B2B;
+	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 10px 14px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	transition: transform 80ms ease-in;
 }
+
+button:active {
+	transform: scale(0.95);
+}
+
+button:focus {
+	outline: none;
+}
+
+button.ghost {
+	background-color: transparent;
+	border-color: #FFFFFF;
+}
+
 
 .result {
     margin-top: 2rem;
@@ -110,7 +136,7 @@ button {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #1e88e5;
+    background: #FF416C;
     border: none;
     color: white;
     padding: 0.4rem 0.6rem;
