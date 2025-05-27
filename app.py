@@ -103,7 +103,7 @@ def summarize():
     word_limit = int(request.form['word_limit'])
     content_type = request.form['content_type']
     result = summarize_text(file, word_limit, content_type)
-    result =markdown_to_html(result)
+    # result =markdown_to_html(result)
     return jsonify({'result': result})
 
 @app.route('/generate_mcq', methods=['POST'])

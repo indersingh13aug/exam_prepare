@@ -85,6 +85,14 @@ label {
     font-weight: 600;
 }
 
+textarea{
+    width: 98%;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+
 input[type="file"],
 input[type="text"],
 input[type="number"],
