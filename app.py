@@ -2,7 +2,7 @@ from flask import Flask, jsonify, render_template, request, redirect, session, u
 import docx
 import PyPDF2
 import requests
-import os
+import os,re
 from dotenv import load_dotenv
 from flask_cors import CORS
 import sqlite3
@@ -18,12 +18,12 @@ CORS(app, origins=["http://localhost:8000"])
 load_dotenv()
 
 # For Dev
-# app.secret_key = "adf703e0db6fbd77635a40638ad2018b"  # Needed for session and flash
-# ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
+app.secret_key = "adf703e0db6fbd77635a40638ad2018b"  # Needed for session and flash
+ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
 
 # For Prod
-app.secret_key = os.environ.get("FLASK_SECRET_KEY")
-ACCESS_TOKEN = os.getenv("GEMINI_API_KEY")
+# app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+# ACCESS_TOKEN = os.getenv("GEMINI_API_KEY")
 
 def init_db():
     conn = sqlite3.connect("users.db")
@@ -81,6 +81,21 @@ def home():
         return redirect(url_for("index"))
     return render_template("home.html", user_email=session["user"])
 
+def markdown_to_html(text):
+    lines = text.strip().splitlines()
+    html_lines = []
+
+    for line in lines:
+        # Match lines like: * **Title:** Description
+        match = re.match(r"\* \*\*(.+?):\*\*(.+)", line)
+        if match:
+            title, desc = match.groups()
+            html_lines.append(f"<li><strong>{title}:</strong>{desc}</li>")
+        elif line.strip().startswith("* "):  # fallback for plain bullet
+            html_lines.append(f"<li>{line.strip()[2:]}</li>")
+
+    return "<ul>" + "\n".join(html_lines) + "</ul>"
+
 
 @app.route('/summarize', methods=['POST'])
 def summarize():
@@ -88,6 +103,7 @@ def summarize():
     word_limit = int(request.form['word_limit'])
     content_type = request.form['content_type']
     result = summarize_text(file, word_limit, content_type)
+    result =markdown_to_html(result)
     return jsonify({'result': result})
 
 @app.route('/generate_mcq', methods=['POST'])
@@ -98,11 +114,9 @@ def generate_mcq_endpoint():
     result = generate_mcq(file, complexity, content_type)
     return jsonify({'result': result})
 
-
-
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={ACCESS_TOKEN}"
 
-def summarize_text_from_string(content, word_limit=100, content_type="general"):
+def summarize_text_from_string(content, word_limit=100, content_type="general",bullet=""):
     headers = {
         "Content-Type": "application/json"
     }
@@ -110,6 +124,9 @@ def summarize_text_from_string(content, word_limit=100, content_type="general"):
     prompt = f"""
         You are an expert in summarizing {content_type.lower()} content.
         Summarize the following text in approximately {word_limit} words. Keep the tone and terminology suitable for the {content_type} domain.
+
+        Instruction:
+        {bullet} using Markdown format.
 
         Text:
         {content}
@@ -127,15 +144,13 @@ def summarize_text_from_string(content, word_limit=100, content_type="general"):
         ]
     }
 
-    response ='this is the summary of the uploaded file.' #requests.post(API_URL, headers=headers, json=payload)
+    response = requests.post(API_URL, headers=headers, json=payload)
 
-    return response
-
-    # if response.status_code == 200:
-    #     result = response.json()
-    #     return result['candidates'][0]['content']['parts'][0]['text']
-    # else:
-    #     return f"Error: {response.status_code} - {response.text}"
+    if response.status_code == 200:
+        result = response.json()
+        return result['candidates'][0]['content']['parts'][0]['text']
+    else:
+        return f"Error: {response.status_code} - {response.text}"
 
 @app.route('/summarize_text', methods=['POST'])
 def summarize_text_route():
@@ -143,11 +158,13 @@ def summarize_text_route():
     content = data.get("content", "")
     word_limit = int(data.get("word_limit", 100))
     content_type = data.get("content_type", "general")
+    bullet = data.get("bullet", "")
 
     if not content.strip():
         return jsonify({'result': 'Empty content received.'})
 
-    result = summarize_text_from_string(content, word_limit, content_type)
+    result = summarize_text_from_string(content, word_limit, content_type,bullet)
+    
     return jsonify({'result': result})
 
 def read_file(file):
@@ -184,7 +201,7 @@ def generate_questions_text_route():
 
 
 def generate_questions_from_string(content,complexity, num_questions=5, content_type="general"):
-    print(content)
+    
     headers = {
         "Content-Type": "application/json"
     }
@@ -267,8 +284,6 @@ def generate_mcq(file, complexity, content_type):
 def summarize_text(file, word_limit=100, content_type="general"):
 
     content = read_file(file)
-    # print(file)
-
     if not content.strip():
         return "File is empty or could not extract content."
 
@@ -307,12 +322,14 @@ def summarize_text(file, word_limit=100, content_type="general"):
     else:
         return f"Error: {response.status_code} - {response.text}"
 
-# if __name__ == '__main__':
-#     init_db()
-#     app.run(debug=True,host="127.0.0.1", port=5000)
-
-
+# Dev
 if __name__ == '__main__':
     init_db()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=False, host="0.0.0.0", port=port)
+    app.run(debug=True,host="127.0.0.1", port=5000)
+
+
+#Prod
+# if __name__ == '__main__':
+#     init_db()
+#     port = int(os.environ.get("PORT", 5000))
+#     app.run(debug=False, host="0.0.0.0", port=port)

@@ -1,329 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Exam Preparation</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .speak-icon {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  Exam Preparation
-  <i class="fas fa-right-from-bracket" title="Sign Out" onclick="signOut()" style="float:right; cursor:pointer; margin-right: 10px;"></i>
-</header>
+  <header>
+    Exam Preparation
+    <i class="fas fa-right-from-bracket" title="Sign Out" onclick="signOut()"
+      style="float:right; cursor:pointer; margin-right: 10px;"></i>
+  </header>
 
-<nav>
-  <button class="active" onclick="switchTab('summarize')">Summarization</button>
-  <button onclick="switchTab('question')">Question Bank</button>
-</nav>
+  <nav>
+    <button class="active" onclick="switchTab('summarize')">Summarization</button>
+    <button onclick="switchTab('question')">Question Bank</button>
+  </nav>
 
-<!-- Summarization Tab -->
-<div class="container" id="summarize-tab">
-  <div class="form-group">
-    <label>Upload File</label>
-    <input type="file" id="fileInput" accept=".txt,.pdf,.docx" />
-    <button onclick="handleFileUploadSum()">Upload</button>
-  </div>
-  <div class="form-group">
-    <label>Preview Content</label>
-    <textarea id="contentPreviewSum" rows="10" style="width:100%" readonly="true"></textarea>
-  </div>
-  <div class="form-group">
-    <label>Content Type</label>
-    <input type="text" placeholder="e.g., Article, Essay" />
-  </div>
-  <div class="form-group">
-    <label>Content Word Count:</label>
-    <div id="wordCount">Upload a file to see word count</div>
-  </div>
-  <div class="form-group">
-    <label>Summary Word Limit (min 50, max 50% of content)</label>
-    <input type="number" id="summaryLimit" disabled placeholder="e.g. 100" />
-  </div>
-  <div class="form-group">
-    <input type="checkbox" id="bulletpoints" name="bulletpoints" value="Summary in Bullet Points">In Bullet points
-  </div>
-
-  <button onclick="showSummary()">Summarize</button>
-  <div id="loading" class="hidden">
-    <div class="spinner"></div> Summarizing...
-  </div>
-
-<div id="summaryResult" class="result hidden">
-  <h3>Summary</h3>
-  <div id="summaryText">
-      
+  <!-- Summarization Tab -->
+  <div class="container" id="summarize-tab">
+    <div class="form-group">
+      <label>Upload File</label>
+      <input type="file" id="fileInput" accept=".txt,.pdf,.docx" />
+      <button onclick="handleFileUploadSum()">Upload</button>
     </div>
-  <i id="copyIcon" class="fas fa-copy" title="Copy" style="cursor:pointer;"></i>
-</div>
-
-  
-</div>
-
-<!-- Question Bank Tab -->
-<div class="container hidden" id="question-tab">
-  <div class="form-group">
-    <label>Upload File</label>
-    <!-- <input type="file" /> -->
-    <input type="file" id="questionFileInput" />
-    <button onclick="handleFileUploadQB()">Upload</button>
-  </div>
-  <div class="form-group">
-    <label>Preview Content</label>
-    <textarea id="contentPreviewQB" rows="10" style="width:100%" readonly="true"></textarea>
-  </div>
-  <div class="form-group">
-    <label>Content Type</label>
-    <!-- <input type="text" placeholder="e.g., Chapter, Lecture" /> -->
-    <input type="text" id="questionContentType" placeholder="e.g., Chapter, Lecture" />
-  </div>
-  <div class="form-group">
-    <label>Difficulty Level</label>
-          <select id="difficultyLevel">
-          <option value="Easy">Easy</option>
-          <option value="Hard">Hard</option>
-          </select>
-  </div>
-  <button onclick="generateQuestionBank()">Generate Question Bank</button>
-  <div id="loadingQB" class="hidden">
-    <div class="spinner"></div> Generating MCQ...
-  </div>
-  <div class="result hidden" id="questionResult">
-    
-    <i class="fas fa-download" title="Download" onclick="downloadText()" style="cursor:pointer; font-size: 1.5rem; margin-top: 1rem; display:inline-block;"></i>
-
-    <div id="questionBankResult">
-      
+    <div class="form-group">
+      <label>Preview Content</label>
+      <textarea id="contentPreviewSum" rows="10" style="width:100%" readonly="true"></textarea>
     </div>
+    <div class="form-group">
+      <label>Content Type</label>
+      <input type="text" placeholder="e.g., Article, Essay" />
+    </div>
+    <div class="form-group">
+      <label>Content Word Count:</label>
+      <div id="wordCount">Upload a file to see word count</div>
+    </div>
+    <div class="form-group">
+      <label>Summary Word Limit (min 50, max 50% of content)</label>
+      <input type="number" id="summaryLimit" disabled placeholder="e.g. 100" />
+    </div>
+    <div class="form-group">
+      <input type="checkbox" id="bulletpoints" name="bulletpoints" value="Bullet">In Bullet points
+    </div>
+
+    <button onclick="showSummary()">Summarize</button>
+    <div id="loading" class="hidden">
+      <div class="spinner"></div> Summarizing...
+    </div>
+
+    <div id="summaryResult" class="result hidden">
+      <h3>Summary</h3>
+      <div id="summaryText">
+
+      </div>
+      <div style="padding-top: 10px;">
+        <i id="copyIcon" class="fas fa-copy" title="Copy" style="cursor:pointer;"></i> &nbsp;
+        <!-- Speak Icon -->
+        <img id="speakIcon" src="https://img.icons8.com/ios-filled/50/speaker.png" class="speak-icon"
+          onclick="toggleSpeech()" alt="Speak">
+      </div>
+    </div>
+
   </div>
-</div>
 
 
-<!-- JS Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script>
+    let isSpeaking = false;
+    let utterance;
 
-<!-- Core Script -->
-<script>
-    document.getElementById("copyIcon").addEventListener("click", () => {
-    const text = document.getElementById("summaryText").innerText;
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Summary copied to clipboard!");
-    }).catch(err => {
-      console.error("Failed to copy:", err);
-    });
-  });
+    function toggleSpeech() {
+      const text = document.getElementById("summaryText").innerText;
 
-  function signOut() {
-    fetch('/logout', {
-      method: 'POST'
-    })
-    .then(() => {
-      window.location.href = '/login';
-    })
-    .catch(error => {
-      console.error('Error during logout:', error);
-    });
-  }
-
-
-  let fileText = "";
-
-  function switchTab(tab) {
-    document.getElementById('summarize-tab').classList.toggle('hidden', tab !== 'summarize');
-    document.getElementById('question-tab').classList.toggle('hidden', tab !== 'question');
-
-    const buttons = document.querySelectorAll('nav button');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    if (tab === 'summarize') buttons[0].classList.add('active');
-    else buttons[1].classList.add('active');
-  }
-
-  function showSummary() {
-  const wordLimit = parseInt(document.getElementById("summaryLimit").value);
-  if (isNaN(wordLimit)) {
-    alert('Non');
-  }
-    
-
-  const contentType = document.querySelector('input[type="text"]').value;
-  const loading = document.getElementById('loading');
-
-  if (!fileText.trim()) {
-    alert("File content is empty. Please upload a valid file.");
-    return;
-  }
-  loading.classList.remove('hidden'); // Show loader
-  const payload = {
-    content: fileText,
-    word_limit: wordLimit,
-    content_type: contentType
-  };
-
-  fetch('/summarize_text', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  })
-  .then(response => response.json())
-  .then(data => {
-    document.getElementById('summaryText').innerText = data.result;
-    document.getElementById('summaryResult').classList.remove('hidden');
-  })
-  .catch(error => console.error(error))
-  .finally(() => {
-    loading.classList.add('hidden'); // Hide loader
-  });
-}
-
-// questionBankResult
-
-  function copyToClipboard(elementId) {
-    const text = document.getElementById(elementId).innerText;
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Summary copied to clipboard!");
-    });
-  }
-
-
-
-function generateQuestionBank() {
-  const contentType = document.querySelector('input[type="text"]').value;
-  const complexity = document.getElementById("difficultyLevel").value;
-  const loading = document.getElementById('loadingQB');
-
-  if (!fileText.trim()) {
-    alert("File content is empty. Please upload a valid file.");
-    return;
-  }
-  loading.classList.remove('hidden'); // Show loader
-  const payload = {
-    content: fileText,
-    content_type: contentType,
-    complexity:complexity
-  };
-
-  fetch('/generate_questions_text', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  })
-  .then(response => response.json())
-  .then(data => {
-    document.getElementById('questionBankResult').innerText = data.result;
-    document.getElementById('questionResult').classList.remove('hidden');
-  })
-  .catch(error => console.error(error))
-  .finally(() => {
-    loading.classList.add('hidden'); // Hide loader
-  });
-}
-
-
-  function downloadText() {
-    const text = Array.from(document.querySelectorAll("#questionTable td:nth-child(2)"))
-                      .map(td => td.innerText)
-                      .join("\n");
-    const blob = new Blob([text], { type: "text/plain" });
-    const link = document.createElement("a");
-    link.download = "question_bank.txt";
-    link.href = URL.createObjectURL(blob);
-    link.click();
-  }
-
-  async function handleFileUploadSum() {
-    const input = document.getElementById("fileInput");
-    const file = input.files[0];
-    const wordCountDisplay = document.getElementById("wordCount");
-    const summaryLimitInput = document.getElementById("summaryLimit");
-
-    if (!file) return;
-
-    const ext = file.name.split('.').pop().toLowerCase();
-
-    if (!["txt", "pdf", "docx"].includes(ext)) {
-      alert("Only .txt, .pdf, or .docx files are allowed.");
-      return;
-    }
-
-    if (ext === "txt") {
-      fileText = await file.text();
-    } else if (ext === "pdf") {
-      fileText = await extractTextFromPDF(file);
-    } else if (ext === "docx") {
-      fileText = await extractTextFromDocx(file);
-    }
-
-    document.getElementById("contentPreviewSum").value = fileText;
-
-    const wordCount = fileText.trim().split(/\s+/).length;
-    wordCountDisplay.textContent = `${wordCount} words`;
-
-    summaryLimitInput.disabled = false;
-    summaryLimitInput.max = Math.floor(wordCount / 2);
-    summaryLimitInput.min = 50;
-    summaryLimitInput.placeholder = `Max ${Math.floor(wordCount / 2)}, Min 50`;
-
-    summaryLimitInput.oninput = () => {
-      const val = parseInt(summaryLimitInput.value);
-      if (val < 50 || val > wordCount / 2) {
-        summaryLimitInput.style.border = "2px solid red";
+      if (!isSpeaking) {
+        // Start speaking
+        utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => {
+          isSpeaking = false;
+        };
+        speechSynthesis.speak(utterance);
+        isSpeaking = true;
       } else {
-        summaryLimitInput.style.border = "1px solid #ccc";
+        // Stop speaking
+        speechSynthesis.cancel();
+        isSpeaking = false;
       }
-    };
-  }
+    }
+  </script>
 
 
-  async function handleFileUploadQB() {
-    const input = document.getElementById("questionFileInput");
-    const file = input.files[0];
+  <!-- Question Bank Tab -->
+  <div class="container hidden" id="question-tab">
+    <div class="form-group">
+      <label>Upload File</label>
+      <!-- <input type="file" /> -->
+      <input type="file" id="questionFileInput" />
+      <button onclick="handleFileUploadQB()">Upload</button>
+    </div>
+    <div class="form-group">
+      <label>Preview Content</label>
+      <textarea id="contentPreviewQB" rows="10" style="width:100%" readonly="true"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Content Type</label>
+      <!-- <input type="text" placeholder="e.g., Chapter, Lecture" /> -->
+      <input type="text" id="questionContentType" placeholder="e.g., Chapter, Lecture" />
+    </div>
+    <div class="form-group">
+      <label>Difficulty Level</label>
+      <select id="difficultyLevel">
+        <option value="Easy">Easy</option>
+        <option value="Hard">Hard</option>
+      </select>
+    </div>
+    <button onclick="generateQuestionBank()">Generate Question Bank</button>
+    <div id="loadingQB" class="hidden">
+      <div class="spinner"></div> Generating MCQ...
+    </div>
+    <div class="result hidden" id="questionResult">
 
-    if (!file) return;
+      <i class="fas fa-download" title="Download" onclick="downloadText()"
+        style="cursor:pointer; font-size: 1.5rem; margin-top: 1rem; display:inline-block;"></i>
 
-    const ext = file.name.split('.').pop().toLowerCase();
+      <div id="questionBankResult">
 
-    if (!["txt", "pdf", "docx"].includes(ext)) {
-      alert("Only .txt, .pdf, or .docx files are allowed.");
-      return;
+      </div>
+    </div>
+  </div>
+
+
+  <!-- JS Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Core Script -->
+  <script>
+    document.getElementById("copyIcon").addEventListener("click", () => {
+      const text = document.getElementById("summaryText").innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Summary copied to clipboard!");
+      }).catch(err => {
+        console.error("Failed to copy:", err);
+      });
+    });
+
+    function signOut() {
+      fetch('/logout', {
+        method: 'POST'
+      })
+        .then(() => {
+          window.location.href = '/login';
+        })
+        .catch(error => {
+          console.error('Error during logout:', error);
+        });
     }
 
-    if (ext === "txt") {
-      fileText = await file.text();
-    } else if (ext === "pdf") {
-      fileText = await extractTextFromPDF(file);
-    } else if (ext === "docx") {
-      fileText = await extractTextFromDocx(file);
+
+    let fileText = "";
+
+    function switchTab(tab) {
+      document.getElementById('summarize-tab').classList.toggle('hidden', tab !== 'summarize');
+      document.getElementById('question-tab').classList.toggle('hidden', tab !== 'question');
+
+      const buttons = document.querySelectorAll('nav button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      if (tab === 'summarize') buttons[0].classList.add('active');
+      else buttons[1].classList.add('active');
     }
 
-    document.getElementById("contentPreviewQB").value = fileText;
+    function showSummary() {
+      const summaryLimit = document.getElementById("summaryLimit").value
 
-  }
+      wordLimit = 0
+      if (summaryLimit == '') {
+        wordLimit = 50
+      }
+      else {
+        wordLimit = parseInt(summaryLimit);
+      }
 
-  async function extractTextFromPDF(file) {
-    const typedArray = new Uint8Array(await file.arrayBuffer());
-    const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
-    let fullText = "";
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      fullText += content.items.map(i => i.str).join(" ") + " ";
+      const contentType = document.querySelector('input[type="text"]').value;
+      const loading = document.getElementById('loading');
+      const checkbox = document.getElementById('bulletpoints');
+      if (checkbox.checked){
+        buttletInstr = 'Please show summary in proper bullet points '
+      }
+      else {
+        buttletInstr = 'Please show summary in paragraph '
+      }
+
+      if (!fileText.trim()) {
+        alert("File content is empty. Please upload a valid file.");
+        return;
+      }
+      loading.classList.remove('hidden'); // Show loader
+      const payload = {
+        content: fileText,
+        word_limit: wordLimit,
+        content_type: contentType,
+        bullet: buttletInstr
+      };
+      fetch('/summarize_text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('summaryText').innerText = data.result;
+          document.getElementById('summaryResult').classList.remove('hidden');
+        })
+        .catch(error => console.error(error))
+        .finally(() => {
+          loading.classList.add('hidden'); // Hide loader
+        });
     }
-    return fullText;
-  }
 
-  async function extractTextFromDocx(file) {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    return result.value;
-  }
-</script>
+    // questionBankResult
+
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Summary copied to clipboard!");
+      });
+    }
+
+
+
+    function generateQuestionBank() {
+      const contentType = document.querySelector('input[type="text"]').value;
+      const complexity = document.getElementById("difficultyLevel").value;
+      const loading = document.getElementById('loadingQB');
+
+      if (!fileText.trim()) {
+        alert("File content is empty. Please upload a valid file.");
+        return;
+      }
+      loading.classList.remove('hidden'); // Show loader
+      const payload = {
+        content: fileText,
+        content_type: contentType,
+        complexity: complexity
+      };
+
+      fetch('/generate_questions_text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('questionBankResult').innerText = data.result;
+          document.getElementById('questionResult').classList.remove('hidden');
+        })
+        .catch(error => console.error(error))
+        .finally(() => {
+          loading.classList.add('hidden'); // Hide loader
+        });
+    }
+
+
+    function downloadText() {
+      const text = Array.from(document.querySelectorAll("#questionTable td:nth-child(2)"))
+        .map(td => td.innerText)
+        .join("\n");
+      const blob = new Blob([text], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.download = "question_bank.txt";
+      link.href = URL.createObjectURL(blob);
+      link.click();
+    }
+
+    async function handleFileUploadSum() {
+      const input = document.getElementById("fileInput");
+      const file = input.files[0];
+      const wordCountDisplay = document.getElementById("wordCount");
+      const summaryLimitInput = document.getElementById("summaryLimit");
+
+      if (!file) return;
+
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (!["txt", "pdf", "docx"].includes(ext)) {
+        alert("Only .txt, .pdf, or .docx files are allowed.");
+        return;
+      }
+
+      if (ext === "txt") {
+        fileText = await file.text();
+      } else if (ext === "pdf") {
+        fileText = await extractTextFromPDF(file);
+      } else if (ext === "docx") {
+        fileText = await extractTextFromDocx(file);
+      }
+
+      document.getElementById("contentPreviewSum").value = fileText;
+
+      const wordCount = fileText.trim().split(/\s+/).length;
+      wordCountDisplay.textContent = `${wordCount} words`;
+
+      summaryLimitInput.disabled = false;
+      summaryLimitInput.max = Math.floor(wordCount / 2);
+      summaryLimitInput.min = 50;
+      summaryLimitInput.placeholder = `Max ${Math.floor(wordCount / 2)}, Min 50`;
+
+      summaryLimitInput.oninput = () => {
+        const val = parseInt(summaryLimitInput.value);
+        if (val < 50 || val > wordCount / 2) {
+          summaryLimitInput.style.border = "2px solid red";
+        } else {
+          summaryLimitInput.style.border = "1px solid #ccc";
+        }
+      };
+    }
+
+
+    async function handleFileUploadQB() {
+      const input = document.getElementById("questionFileInput");
+      const file = input.files[0];
+
+      if (!file) return;
+
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (!["txt", "pdf", "docx"].includes(ext)) {
+        alert("Only .txt, .pdf, or .docx files are allowed.");
+        return;
+      }
+
+      if (ext === "txt") {
+        fileText = await file.text();
+      } else if (ext === "pdf") {
+        fileText = await extractTextFromPDF(file);
+      } else if (ext === "docx") {
+        fileText = await extractTextFromDocx(file);
+      }
+
+      document.getElementById("contentPreviewQB").value = fileText;
+
+    }
+
+    async function extractTextFromPDF(file) {
+      const typedArray = new Uint8Array(await file.arrayBuffer());
+      const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+      let fullText = "";
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        fullText += content.items.map(i => i.str).join(" ") + " ";
+      }
+      return fullText;
+    }
+
+    async function extractTextFromDocx(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      return result.value;
+    }
+  </script>
 
 </body>
+
 </html>
