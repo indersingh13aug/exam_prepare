@@ -57,7 +57,7 @@
 
     <button onclick="showSummary()">Summarize</button>
     <div id="loading" class="hidden">
-      <div class="spinner"></div> Summarizing...
+      <div class="spinner"></div> Summarization is in progress...
     </div>
 
     <div id="summaryResult" class="result hidden">
@@ -222,7 +222,7 @@
       })
         .then(response => response.json())
         .then(data => {
-          document.getElementById('summaryText').innerText = data.result;
+          document.getElementById('summaryText').innerHTML = data.result;
           document.getElementById('summaryResult').classList.remove('hidden');
         })
         .catch(error => console.error(error))
@@ -267,7 +267,7 @@
       })
         .then(response => response.json())
         .then(data => {
-          document.getElementById('questionBankResult').innerText = data.result;
+          document.getElementById('questionBankResult').innerHTML  = data.result;
           document.getElementById('questionResult').classList.remove('hidden');
         })
         .catch(error => console.error(error))
