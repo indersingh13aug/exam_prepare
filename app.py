@@ -87,7 +87,7 @@ def markdown_to_html(text):
 
     for line in lines:
         match = re.match(r"\*\s*\*\*(.+?):\*\*(.+)", line.strip())
-        print(line.strip())
+        # print(line.strip())
         if match:
             title, desc = match.groups()
             html_lines.append(f"<li><strong>{title}:</strong>{desc}</li>")
@@ -95,7 +95,7 @@ def markdown_to_html(text):
             html_lines.append(f"<li>{line.strip()[2:]}</li>")
         else:
             html_lines.append(line)
-    print(html_lines)
+    # print(html_lines)
     return "<ul>" + "\n".join(html_lines) + "</ul>"
 
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={ACCESS_TOKEN}"
