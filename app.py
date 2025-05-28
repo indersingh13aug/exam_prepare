@@ -18,12 +18,12 @@ CORS(app, origins=["http://localhost:8000"])
 load_dotenv()
 
 # For Dev
-# app.secret_key = "adf703e0db6fbd77635a40638ad2018b"  # Needed for session and flash
-# ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
+app.secret_key = "adf703e0db6fbd77635a40638ad2018b"  # Needed for session and flash
+ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
 
 # For Prod
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
-ACCESS_TOKEN = os.getenv("GEMINI_API_KEY")
+# app.secret_key = os.getenv("FLASK_SECRET_KEY")
+# ACCESS_TOKEN = os.getenv("GEMINI_API_KEY")
 
 def init_db():
     conn = sqlite3.connect("users.db")
@@ -37,7 +37,7 @@ def init_db():
     """)
     # Add a test user (run once)
     cursor.execute("INSERT OR IGNORE INTO users (email, password) VALUES (?, ?)", 
-                   ("test@example.com", "password123"))
+                   ("admin", "admin123"))
     conn.commit()
     conn.close()
 
@@ -57,17 +57,17 @@ def login_redirect():
 
 @app.route("/login", methods=["POST"])
 def login():
-    email = request.form["email"]
+    username = request.form["username"]
     password = request.form["password"]
 
     conn = sqlite3.connect("users.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
+    cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (username, password))
     user = cursor.fetchone()
     conn.close()
 
     if user:
-        session["user"] = email  # Store email in session
+        session["user"] = username  # Store email in session
         return redirect(url_for("home"))
     else:
         flash("Invalid email or password!")
@@ -86,7 +86,8 @@ def markdown_to_html(text):
     html_lines = []
 
     for line in lines:
-        match = re.match(r"\* \*\*(.+?):\*\*(.+)", line.strip())
+        match = re.match(r"\*\s*\*\*(.+?):\*\*(.+)", line.strip())
+        print(line.strip())
         if match:
             title, desc = match.groups()
             html_lines.append(f"<li><strong>{title}:</strong>{desc}</li>")
@@ -94,7 +95,7 @@ def markdown_to_html(text):
             html_lines.append(f"<li>{line.strip()[2:]}</li>")
         else:
             html_lines.append(line)
-
+    print(html_lines)
     return "<ul>" + "\n".join(html_lines) + "</ul>"
 
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={ACCESS_TOKEN}"
@@ -197,6 +198,6 @@ def generate_questions_from_string(content,complexity, num_questions=5, content_
 if __name__ == '__main__':
     init_db()
     # Dev
-    # app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
     # Prod
-    app.run(debug=False, host="0.0.0.0", port=5000)
+    # app.run(debug=False, host="0.0.0.0", port=5000)
