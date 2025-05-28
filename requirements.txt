@@ -5,4 +5,4 @@ python-docx
 PyPDF2
 requests
 gunicorn
-YouTubeTranscriptApi
+youtube-transcript-api
