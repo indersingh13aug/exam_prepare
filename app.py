@@ -92,6 +92,8 @@ def markdown_to_html(text):
             html_lines.append(f"<li><strong>{title}:</strong>{desc}</li>")
         elif line.strip().startswith("* "):
             html_lines.append(f"<li>{line.strip()[2:]}</li>")
+        else:
+            html_lines.append(line)
 
     return "<ul>" + "\n".join(html_lines) + "</ul>"
 
@@ -107,7 +109,7 @@ def summarize_text_from_string(content, word_limit=100, content_type="general",b
         Summarize the following text in approximately {word_limit} words. Keep the tone and terminology suitable for the {content_type} domain.
 
         Instruction:
-        {bullet} using Markdown format.
+        {bullet}.
 
         Text:
         {content}
