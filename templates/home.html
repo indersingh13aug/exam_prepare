@@ -28,12 +28,27 @@
     <button onclick="switchTab('question')">Question Bank</button>
   </nav>
 
+
   <!-- Summarization Tab -->
   <div class="container" id="summarize-tab">
-    <div class="form-group">
-      <label>Upload File</label>
-      <input type="file" id="fileInput" accept=".txt,.pdf,.docx" />
-      <button onclick="handleFileUploadSum()">Upload</button>
+    <div>
+      <button id="fileTabBtn">Upload File</button>
+      <button id="videoTabBtn">Insert Video</button>
+    </div>
+    <div id="fileSection">
+      <div class="form-group">
+        <label>Upload File</label>
+        <input type="file" id="fileInput" accept=".txt,.pdf,.docx" />
+        <button onclick="handleFileUploadSum()">Upload</button>
+      </div>
+    </div>
+    <!-- ✅ Video URL Section (Hidden by Default) -->
+    <div id="videoSection">
+      <div class="form-group">
+        <label>Insert Video URL</label>
+        <input type="text" id="videoUrl" placeholder="Enter YouTube or video URL" />
+        <button onclick="getYouTubeVideoID()">Load Video</button>
+      </div>
     </div>
     <div class="form-group">
       <label>Preview Content</label>
@@ -75,8 +90,23 @@
 
   </div>
 
-
+  <!-- 🔁 JavaScript for Switching -->
   <script>
+    const fileTabBtn = document.getElementById("fileTabBtn");
+    const videoTabBtn = document.getElementById("videoTabBtn");
+    const fileSection = document.getElementById("fileSection");
+    const videoSection = document.getElementById("videoSection");
+
+    fileTabBtn.onclick = () => {
+      fileSection.classList.remove("hidden");
+      videoSection.classList.add("hidden");
+    };
+
+    videoTabBtn.onclick = () => {
+      videoSection.classList.remove("hidden");
+      fileSection.classList.add("hidden");
+    };
+
     let isSpeaking = false;
     let utterance;
 
@@ -171,6 +201,29 @@
 
     let fileText = "";
 
+    async function getYouTubeVideoID() {
+      const yt_url = document.getElementById('videoUrl').value;
+      const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+      const match = yt_url.match(regex);
+      const videoId = match ? match[1] : null;
+      const payload = {
+        video_id: videoId
+      };
+      fetch('/video_transcript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          fileText=data.result;
+          document.getElementById('contentPreviewSum').innerText = data.result;
+        })
+        .catch(error => console.error(error));
+    }
+
     function switchTab(tab) {
       document.getElementById('summarize-tab').classList.toggle('hidden', tab !== 'summarize');
       document.getElementById('question-tab').classList.toggle('hidden', tab !== 'question');
@@ -195,7 +248,7 @@
       const contentType = document.querySelector('input[type="text"]').value;
       const loading = document.getElementById('loading');
       const checkbox = document.getElementById('bulletpoints');
-      if (checkbox.checked){
+      if (checkbox.checked) {
         buttletInstr = 'Please show summary in proper bullet points '
       }
       else {
@@ -267,7 +320,7 @@
       })
         .then(response => response.json())
         .then(data => {
-          document.getElementById('questionBankResult').innerText  = data.result;
+          document.getElementById('questionBankResult').innerText = data.result;
           document.getElementById('questionResult').classList.remove('hidden');
         })
         .catch(error => console.error(error))

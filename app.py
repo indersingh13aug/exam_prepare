@@ -6,6 +6,7 @@ import os,re
 from dotenv import load_dotenv
 from flask_cors import CORS
 import sqlite3
+from youtube_transcript_api import YouTubeTranscriptApi
 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -150,6 +151,15 @@ def summarize_text_route():
     result = summarize_text_from_string(content, word_limit, content_type,bullet)
     result = markdown_to_html(result)
     return jsonify({'result': result})
+
+@app.route('/video_transcript', methods=['POST'])
+def video_transcript():
+    data = request.get_json()
+    video_id = data.get("video_id", "")
+    transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    full_text = " ".join([entry['text'] for entry in transcript])
+    return jsonify({'result': full_text})
+
 
 @app.route('/generate_questions_text', methods=['POST'])
 def generate_questions_text_route():

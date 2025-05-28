@@ -83,6 +83,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
+    margin-top: 3px;
 }
 
 textarea{
@@ -116,6 +117,7 @@ button {
 	letter-spacing: 1px;
 	text-transform: uppercase;
 	transition: transform 80ms ease-in;
+    margin-top: -5px;
 }
 
 button:active {
