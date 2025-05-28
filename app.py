@@ -22,8 +22,8 @@ load_dotenv()
 # ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
 
 # For Prod
-app.secret_key = os.environ.get("FLASK_SECRET_KEY")
-ACCESS_TOKEN = os.getenv.get("GEMINI_API_KEY")
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+ACCESS_TOKEN = os.getenv("GEMINI_API_KEY")
 
 def init_db():
     conn = sqlite3.connect("users.db")
