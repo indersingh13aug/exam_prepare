@@ -82,7 +82,6 @@ def home():
     return render_template("home.html", user_email=session["user"])
 
 def markdown_to_html(text):
-    print(text)
     lines = text.strip().splitlines()
     html_lines = []
 
