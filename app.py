@@ -205,6 +205,6 @@ def generate_questions_from_string(content,complexity, num_questions=5):
 if __name__ == '__main__':
     init_db()
     # Dev
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # app.run(debug=True, host="0.0.0.0", port=5000)
     # Prod
-    # app.run(debug=False, host="0.0.0.0", port=5000)
+    app.run(debug=False, host="0.0.0.0", port=5000)
