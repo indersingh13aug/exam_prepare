@@ -101,14 +101,13 @@ def markdown_to_html(text):
 
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={ACCESS_TOKEN}"
 
-def summarize_text_from_string(content, word_limit=100, content_type="general",bullet=""):
+def summarize_text_from_string(content, word_limit=100, bullet=""):
     headers = {
         "Content-Type": "application/json"
     }
 
     prompt = f"""
-        You are an expert in summarizing {content_type.lower()} content.
-        Summarize the following text in approximately {word_limit} words. Keep the tone and terminology suitable for the {content_type} domain.
+        Please Summarize the following text in approximately {word_limit} words. 
 
         Instruction:
         {bullet}.
@@ -142,13 +141,12 @@ def summarize_text_route():
     data = request.get_json()
     content = data.get("content", "")
     word_limit = int(data.get("word_limit", 100))
-    content_type = data.get("content_type", "general")
     bullet = data.get("bullet", "")
 
     if not content.strip():
         return jsonify({'result': 'Empty content received.'})
 
-    result = summarize_text_from_string(content, word_limit, content_type,bullet)
+    result = summarize_text_from_string(content, word_limit,bullet)
     result = markdown_to_html(result)
     return jsonify({'result': result})
 
@@ -158,30 +156,29 @@ def video_transcript():
     video_id = data.get("video_id", "")
     transcript = YouTubeTranscriptApi.get_transcript(video_id)
     full_text = " ".join([entry['text'] for entry in transcript])
+    # print(full_text)
     return jsonify({'result': full_text})
-
 
 @app.route('/generate_questions_text', methods=['POST'])
 def generate_questions_text_route():
     data = request.get_json()
     content = data.get("content", "")
-    content_type = data.get("content_type", "general")
     complexity=data.get("complexity", "simple")
 
     if not content.strip():
         return jsonify({'result': 'Empty content received.'})
 
-    result = generate_questions_from_string(content, complexity, content_type=content_type)
+    result = generate_questions_from_string(content, complexity)
     return jsonify({'result': result})
 
-def generate_questions_from_string(content,complexity, num_questions=5, content_type="general"):
+def generate_questions_from_string(content,complexity, num_questions=5):
     
     headers = {
         "Content-Type": "application/json"
     }
 
     prompt = (
-        f"The following is a {content_type}. Generate {num_questions} multiple choice questions with {complexity} complexity:\n\n"
+        f"Please Generate {num_questions} multiple choice questions with {complexity} complexity:\n\n"
         f"{content}\n\n"
         f"Format:\n"
         f"1. Question text?\n  a) Option A\n  b) Option B\n  c) Option C\n  d) Option D\nAnswer: <correct option>\n"

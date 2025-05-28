@@ -28,15 +28,14 @@
     <button onclick="switchTab('question')">Question Bank</button>
   </nav>
 
-
   <!-- Summarization Tab -->
   <div class="container" id="summarize-tab">
-    <input type="radio" id="fileTabBtn" name="action" value="upload"><label for="upload">Upload File</label><input type="radio" id="videoTabBtn" name="action" value="insert"><label for="insert">Insert Video</label><br>
+    <input type="radio" id="fileTabBtn" name="action" value="upload"><label for="upload">Upload File</label><input type="radio" id="videoTabBtn" name="action" value="insert"><label for="insert">Upload Video(Preview)</label><br>
     <div id="fileSection">
       <div class="form-group">
         <label>Upload File</label>
         <input type="file" id="fileInput" accept=".txt,.pdf,.docx" />
-        <button onclick="handleFileUploadSum()">Upload</button>
+        <button onclick="handleFileUpload()">Upload</button>
       </div>
     </div>
     <!-- ✅ Video URL Section (Hidden by Default) -->
@@ -51,10 +50,7 @@
       <label>Preview Content</label>
       <textarea id="contentPreviewSum" rows="5" readonly="true"></textarea>
     </div>
-    <div class="form-group">
-      <label>Content Type</label>
-      <input type="text" placeholder="e.g., Article, Essay" />
-    </div>
+
     <div class="form-group">
       <label>Content Word Count:</label>
       <!-- <div id="wordCount">Upload a file to see word count</div> -->
@@ -88,64 +84,31 @@
 
   </div>
 
-  <!-- 🔁 JavaScript for Switching -->
-  <script>
-    const fileTabBtn = document.getElementById("fileTabBtn");
-    const videoTabBtn = document.getElementById("videoTabBtn");
-    const fileSection = document.getElementById("fileSection");
-    const videoSection = document.getElementById("videoSection");
-    videoSection.classList.remove("hidden");
-    fileSection.classList.add("hidden");
-    fileTabBtn.onclick = () => {
-      fileSection.classList.remove("hidden");
-      videoSection.classList.add("hidden");
-    };
-
-    videoTabBtn.onclick = () => {
-      videoSection.classList.remove("hidden");
-      fileSection.classList.add("hidden");
-    };
-
-    let isSpeaking = false;
-    let utterance;
-
-    function toggleSpeech() {
-      const text = document.getElementById("summaryText").innerText;
-
-      if (!isSpeaking) {
-        // Start speaking
-        utterance = new SpeechSynthesisUtterance(text);
-        utterance.onend = () => {
-          isSpeaking = false;
-        };
-        speechSynthesis.speak(utterance);
-        isSpeaking = true;
-      } else {
-        // Stop speaking
-        speechSynthesis.cancel();
-        isSpeaking = false;
-      }
-    }
-  </script>
-
-
-  <!-- Question Bank Tab -->
+<!-- Question Bank Tab -->
   <div class="container hidden" id="question-tab">
-    <div class="form-group">
-      <label>Upload File</label>
-      <!-- <input type="file" /> -->
-      <input type="file" id="questionFileInput" />
-      <button onclick="handleFileUploadQB()">Upload</button>
+    <input type="radio" id="fileTabBtnqb" name="action" value="uploadqb"><label for="uploadqb">Upload File</label><input type="radio" id="videoTabBtnqb" name="action" value="insertqb"><label for="insert">Upload Video(Preview)</label><br>
+    <div id="fileSectionqb">
+      <div class="form-group">
+        <label>Upload File</label>
+        <input type="file" id="fileInputqb" accept=".txt,.pdf,.docx" />
+        <button onclick="handleFileUploadqb()">Upload</button>
+      </div>
     </div>
+    <!-- ✅ Video URL Section (Hidden by Default) -->
+    <div id="videoSectionqb">
+      <div class="form-group">
+        <label>Video URL</label>
+        <input type="text" id="videoUrlqb" placeholder="Enter YouTube or video URL" />
+        <button onclick="getYouTubeVideoIDqb()">Load Video</button>
+      </div>
+    </div>
+
     <div class="form-group">
+
       <label>Preview Content</label>
       <textarea id="contentPreviewQB" rows="5" readonly="true"></textarea>
     </div>
-    <div class="form-group">
-      <label>Content Type</label>
-      <!-- <input type="text" placeholder="e.g., Chapter, Lecture" /> -->
-      <input type="text" id="questionContentType" placeholder="e.g., Chapter, Lecture" />
-    </div>
+
     <div class="form-group">
       <label>Difficulty Level</label>
       <select id="difficultyLevel">
@@ -185,6 +148,64 @@
       });
     });
 
+    
+    const fileTabBtnqb = document.getElementById("fileTabBtnqb");
+    const videoTabBtnqb = document.getElementById("videoTabBtnqb");
+    const fileSectionqb = document.getElementById("fileSectionqb");
+    const videoSectionqb = document.getElementById("videoSectionqb");
+    fileSectionqb.classList.remove("hidden");
+    videoSectionqb.classList.add("hidden");
+    fileTabBtnqb.onclick = () => {
+      fileSectionqb.classList.remove("hidden");
+      videoSectionqb.classList.add("hidden");
+      clean();
+    };
+
+    videoTabBtnqb.onclick = () => {
+      videoSectionqb.classList.remove("hidden");
+      fileSectionqb.classList.add("hidden");
+      clean();
+    };
+
+    const fileTabBtn = document.getElementById("fileTabBtn");
+    const videoTabBtn = document.getElementById("videoTabBtn");
+    const fileSection = document.getElementById("fileSection");
+    const videoSection = document.getElementById("videoSection");
+    fileSection.classList.remove("hidden");
+    videoSection.classList.add("hidden");
+    fileTabBtn.onclick = () => {
+      fileSection.classList.remove("hidden");
+      videoSection.classList.add("hidden");
+      clean();
+    };
+
+    videoTabBtn.onclick = () => {
+      videoSection.classList.remove("hidden");
+      fileSection.classList.add("hidden");
+      clean();
+    };
+
+    let isSpeaking = false;
+    let utterance;
+
+    function toggleSpeech() {
+      const text = document.getElementById("summaryText").innerText;
+
+      if (!isSpeaking) {
+        // Start speaking
+        utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => {
+          isSpeaking = false;
+        };
+        speechSynthesis.speak(utterance);
+        isSpeaking = true;
+      } else {
+        // Stop speaking
+        speechSynthesis.cancel();
+        isSpeaking = false;
+      }
+    }
+
     function signOut() {
       fetch('/logout', {
         method: 'POST'
@@ -199,6 +220,31 @@
 
 
     let fileText = "";
+    let fileTextqb="";
+
+    async function getYouTubeVideoIDqb() {
+      const yt_url = document.getElementById('videoUrlqb').value;
+      const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+      const match = yt_url.match(regex);
+      const videoId = match ? match[1] : null;
+      const payload = {
+        video_id: videoId
+      };
+      
+      fetch('/video_transcript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          fileTextqb=data.result;
+          document.getElementById('contentPreviewQB').value = fileTextqb;
+        })
+        .catch(error => console.error(error));
+    }
 
     async function getYouTubeVideoID() {
       const yt_url = document.getElementById('videoUrl').value;
@@ -218,7 +264,7 @@
         .then(response => response.json())
         .then(data => {
           fileText=data.result;
-          document.getElementById('contentPreviewSum').innerText = data.result;
+          document.getElementById('contentPreviewSum').value = fileText;
         })
         .catch(error => console.error(error));
     }
@@ -226,7 +272,7 @@
     function switchTab(tab) {
       document.getElementById('summarize-tab').classList.toggle('hidden', tab !== 'summarize');
       document.getElementById('question-tab').classList.toggle('hidden', tab !== 'question');
-
+      clean();
       const buttons = document.querySelectorAll('nav button');
       buttons.forEach(btn => btn.classList.remove('active'));
       if (tab === 'summarize') buttons[0].classList.add('active');
@@ -244,7 +290,6 @@
         wordLimit = parseInt(summaryLimit);
       }
 
-      const contentType = document.querySelector('input[type="text"]').value;
       const loading = document.getElementById('loading');
       const checkbox = document.getElementById('bulletpoints');
       if (checkbox.checked) {
@@ -262,7 +307,6 @@
       const payload = {
         content: fileText,
         word_limit: wordLimit,
-        content_type: contentType,
         bullet: buttletInstr
       };
       fetch('/summarize_text', {
@@ -283,8 +327,6 @@
         });
     }
 
-    // questionBankResult
-
     function copyToClipboard(elementId) {
       const text = document.getElementById(elementId).innerText;
       navigator.clipboard.writeText(text).then(() => {
@@ -292,21 +334,17 @@
       });
     }
 
-
-
     function generateQuestionBank() {
-      const contentType = document.querySelector('input[type="text"]').value;
       const complexity = document.getElementById("difficultyLevel").value;
       const loading = document.getElementById('loadingQB');
 
-      if (!fileText.trim()) {
+      if (!fileTextqb.trim()) {
         alert("File content is empty. Please upload a valid file.");
         return;
       }
       loading.classList.remove('hidden'); // Show loader
       const payload = {
-        content: fileText,
-        content_type: contentType,
+        content: fileTextqb,
         complexity: complexity
       };
 
@@ -328,7 +366,6 @@
         });
     }
 
-
     function downloadText() {
       const text = Array.from(document.querySelectorAll("#questionTable td:nth-child(2)"))
         .map(td => td.innerText)
@@ -340,7 +377,7 @@
       link.click();
     }
 
-    async function handleFileUploadSum() {
+    async function handleFileUpload() {
       const input = document.getElementById("fileInput");
       const file = input.files[0];
       const wordCountDisplay = document.getElementById("wordCount");
@@ -384,9 +421,8 @@
       };
     }
 
-
-    async function handleFileUploadQB() {
-      const input = document.getElementById("questionFileInput");
+    async function handleFileUploadqb() {
+      const input = document.getElementById("fileInputqb");
       const file = input.files[0];
 
       if (!file) return;
@@ -399,14 +435,14 @@
       }
 
       if (ext === "txt") {
-        fileText = await file.text();
+        fileTextqb = await file.text();
       } else if (ext === "pdf") {
-        fileText = await extractTextFromPDF(file);
+        fileTextqb = await extractTextFromPDF(file);
       } else if (ext === "docx") {
-        fileText = await extractTextFromDocx(file);
+        fileTextqb = await extractTextFromDocx(file);
       }
 
-      document.getElementById("contentPreviewQB").value = fileText;
+      document.getElementById("contentPreviewQB").value = fileTextqb;
 
     }
 
@@ -427,6 +463,13 @@
       const result = await mammoth.extractRawText({ arrayBuffer });
       return result.value;
     }
+    function clean(){
+      document.getElementById('contentPreviewSum').value=''
+      document.getElementById('contentPreviewQB').value=''
+      fileText=''
+      fileTextqb=''
+    }
+  
   </script>
 
 </body>
