@@ -31,10 +31,7 @@
 
   <!-- Summarization Tab -->
   <div class="container" id="summarize-tab">
-    <div>
-      <button id="fileTabBtn">Upload File</button>
-      <button id="videoTabBtn">Insert Video</button>
-    </div>
+    <input type="radio" id="fileTabBtn" name="action" value="upload"><label for="upload">Upload File</label><input type="radio" id="videoTabBtn" name="action" value="insert"><label for="insert">Insert Video</label><br>
     <div id="fileSection">
       <div class="form-group">
         <label>Upload File</label>
@@ -45,7 +42,7 @@
     <!-- ✅ Video URL Section (Hidden by Default) -->
     <div id="videoSection">
       <div class="form-group">
-        <label>Insert Video URL</label>
+        <label>Video URL</label>
         <input type="text" id="videoUrl" placeholder="Enter YouTube or video URL" />
         <button onclick="getYouTubeVideoID()">Load Video</button>
       </div>
@@ -60,7 +57,8 @@
     </div>
     <div class="form-group">
       <label>Content Word Count:</label>
-      <div id="wordCount">Upload a file to see word count</div>
+      <!-- <div id="wordCount">Upload a file to see word count</div> -->
+      <input id="wordCount" type="text" placeholder="Upload a file to see word count" readonly="true" />
     </div>
     <div class="form-group">
       <label>Summary Word Limit (min 50, max 50% of content)</label>
@@ -96,7 +94,8 @@
     const videoTabBtn = document.getElementById("videoTabBtn");
     const fileSection = document.getElementById("fileSection");
     const videoSection = document.getElementById("videoSection");
-
+    videoSection.classList.remove("hidden");
+    fileSection.classList.add("hidden");
     fileTabBtn.onclick = () => {
       fileSection.classList.remove("hidden");
       videoSection.classList.add("hidden");
@@ -367,7 +366,8 @@
       document.getElementById("contentPreviewSum").value = fileText;
 
       const wordCount = fileText.trim().split(/\s+/).length;
-      wordCountDisplay.textContent = `${wordCount} words`;
+      // wordCountDisplay.textContent = `${wordCount} words`;
+      document.getElementById("wordCount").value = `${wordCount} words`;
 
       summaryLimitInput.disabled = false;
       summaryLimitInput.max = Math.floor(wordCount / 2);
