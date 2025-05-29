@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, render_template, request, redirect, session, url_for, flash 
-import whisper
+# import whisper
 import docx
 import PyPDF2
 import requests
@@ -27,7 +27,7 @@ load_dotenv()
 app.secret_key = "adf703e0db6fbd77635a40638ad2018b"  # Needed for session and flash
 ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
 warnings.filterwarnings("ignore", category=UserWarning)
-model = whisper.load_model("base")
+# model = whisper.load_model("base")
 
 # For Prod
 # app.secret_key = os.getenv("FLASK_SECRET_KEY")
@@ -164,31 +164,31 @@ def video_transcript():
     data = request.get_json()
     video_url = data.get("video_url", "")
     audio_filename = "audio.mp3"
+    return jsonify({'result': 'This functionality is not avaiable for demo.'})
+    # metadata_json = subprocess.check_output([
+    #     "yt-dlp",
+    #     "--dump-json",
+    #     video_url
+    # ], text=True)
 
-    metadata_json = subprocess.check_output([
-        "yt-dlp",
-        "--dump-json",
-        video_url
-    ], text=True)
+    # metadata = json.loads(metadata_json)
 
-    metadata = json.loads(metadata_json)
+    # if (metadata.get("duration") > 120):
+    #     return jsonify({'result': "Video duration should be less than 2 mint."}) 
 
-    if (metadata.get("duration") > 120):
-        return jsonify({'result': "Video duration should be less than 2 mint."}) 
+    # # # Step 2: Download audio using yt-dlp
+    # subprocess.run([
+    #     "yt-dlp",
+    #     "-x",
+    #     "--audio-format", "mp3",
+    #     "-o", audio_filename,
+    #     video_url
+    # ])
 
-    # # Step 2: Download audio using yt-dlp
-    subprocess.run([
-        "yt-dlp",
-        "-x",
-        "--audio-format", "mp3",
-        "-o", audio_filename,
-        video_url
-    ])
-
-    # # Step 3: Transcribe using Whisper
-    result = model.transcribe(audio_filename)
-    os.remove(audio_filename)
-    return jsonify({'result': result['text']})
+    # # # Step 3: Transcribe using Whisper
+    # result = model.transcribe(audio_filename)
+    # os.remove(audio_filename)
+    # return jsonify({'result': result['text']})
 
 @app.route('/generate_questions_text', methods=['POST'])
 def generate_questions_text_route():

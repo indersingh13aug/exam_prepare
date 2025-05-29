@@ -42,7 +42,7 @@
     <div id="videoSection">
       <div class="form-group">
         <label>Video URL</label>
-        <input type="text" id="videoUrl" placeholder="Enter YouTube or video URL" />
+        <input type="text" id="videoUrl" placeholder="Enter YouTube video URL" />
         <button onclick="getYouTubeVideoID()">Load Video</button>
       </div>
     </div>
@@ -98,7 +98,7 @@
     <div id="videoSectionqb">
       <div class="form-group">
         <label>Video URL</label>
-        <input type="text" id="videoUrlqb" placeholder="Enter YouTube or video URL" />
+        <input type="text" id="videoUrlqb" placeholder="Enter YouTube video URL" />
         <button onclick="getYouTubeVideoIDqb()">Load Video</button>
       </div>
     </div>
@@ -224,12 +224,17 @@
 
     async function getYouTubeVideoIDqb() {
       const yt_url = document.getElementById('videoUrlqb').value;
-      const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
-      const match = yt_url.match(regex);
-      const videoId = match ? match[1] : null;
+      // const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+      // const match = yt_url.match(regex);
+      // const videoId = match ? match[1] : null;
+      if (yt_url.trim() == ''){
+        alert('Please enter video url.');
+        return;
+      }
       const payload = {
-        video_id: videoId
+        video_url: yt_url
       };
+      
       
       fetch('/video_transcript', {
         method: 'POST',
@@ -251,10 +256,15 @@
       // const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
       // const match = yt_url.match(regex);
       // const videoId = match ? match[1] : null;
+      if (yt_url.trim() == ''){
+        alert('Please enter video url.');
+        return;
+      }
 
       const payload = {
         video_url: yt_url
       };
+
       fetch('/video_transcript', {
         method: 'POST',
         headers: {

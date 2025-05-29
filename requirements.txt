@@ -6,6 +6,6 @@ PyPDF2
 requests
 gunicorn
 # youtube-transcript-api
-git+https://github.com/openai/whisper.git
-pytube
-torch
+# git+https://github.com/openai/whisper.git
+# pytube
+# torch
