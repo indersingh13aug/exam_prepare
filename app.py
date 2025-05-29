@@ -164,7 +164,7 @@ def video_transcript():
     data = request.get_json()
     video_url = data.get("video_url", "")
     audio_filename = "audio.mp3"
-    return jsonify({'result': 'This functionality is not avaiable for demo.'})
+    return jsonify({'result': 'Upgrade to Pro'})
     # metadata_json = subprocess.check_output([
     #     "yt-dlp",
     #     "--dump-json",
