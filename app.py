@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, render_template, request, redirect, session, url_for, flash 
+import whisper
 import docx
 import PyPDF2
 import requests
@@ -6,7 +7,11 @@ import os,re
 from dotenv import load_dotenv
 from flask_cors import CORS
 import sqlite3
-from youtube_transcript_api import YouTubeTranscriptApi
+# from youtube_transcript_api import YouTubeTranscriptApi
+import os
+import subprocess
+import json
+import warnings
 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -21,6 +26,8 @@ load_dotenv()
 # For Dev
 app.secret_key = "adf703e0db6fbd77635a40638ad2018b"  # Needed for session and flash
 ACCESS_TOKEN = 'AIzaSyDd-JR1M20_vGgCtf0LYCEy1p5YFsDy1ts'
+warnings.filterwarnings("ignore", category=UserWarning)
+model = whisper.load_model("base")
 
 # For Prod
 # app.secret_key = os.getenv("FLASK_SECRET_KEY")
@@ -110,9 +117,11 @@ def summarize_text_from_string(content, word_limit=100, bullet=""):
         Please Summarize the following text in approximately {word_limit} words. 
 
         Instruction:
+        Please check the content language.
+        Please Summarize the content in same language.
         {bullet}.
 
-        Text:
+        Content:
         {content}
 
         Summary:
@@ -153,11 +162,33 @@ def summarize_text_route():
 @app.route('/video_transcript', methods=['POST'])
 def video_transcript():
     data = request.get_json()
-    video_id = data.get("video_id", "")
-    transcript = YouTubeTranscriptApi.get_transcript(video_id)
-    full_text = " ".join([entry['text'] for entry in transcript])
-    # print(full_text)
-    return jsonify({'result': full_text})
+    video_url = data.get("video_url", "")
+    audio_filename = "audio.mp3"
+
+    metadata_json = subprocess.check_output([
+        "yt-dlp",
+        "--dump-json",
+        video_url
+    ], text=True)
+
+    metadata = json.loads(metadata_json)
+
+    if (metadata.get("duration") > 120):
+        return jsonify({'result': "Video duration should be less than 2 mint."}) 
+
+    # # Step 2: Download audio using yt-dlp
+    subprocess.run([
+        "yt-dlp",
+        "-x",
+        "--audio-format", "mp3",
+        "-o", audio_filename,
+        video_url
+    ])
+
+    # # Step 3: Transcribe using Whisper
+    result = model.transcribe(audio_filename)
+    os.remove(audio_filename)
+    return jsonify({'result': result['text']})
 
 @app.route('/generate_questions_text', methods=['POST'])
 def generate_questions_text_route():
@@ -179,7 +210,7 @@ def generate_questions_from_string(content,complexity, num_questions=5):
 
     prompt = (
         f"Please Generate {num_questions} multiple choice questions with {complexity} complexity:\n\n"
-        f"{content}\n\n"
+        f"Content: {content}\n\n"
         f"Format:\n"
         f"1. Question text?\n  a) Option A\n  b) Option B\n  c) Option C\n  d) Option D\nAnswer: <correct option>\n"
     )

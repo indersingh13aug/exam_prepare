@@ -248,11 +248,12 @@
 
     async function getYouTubeVideoID() {
       const yt_url = document.getElementById('videoUrl').value;
-      const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
-      const match = yt_url.match(regex);
-      const videoId = match ? match[1] : null;
+      // const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+      // const match = yt_url.match(regex);
+      // const videoId = match ? match[1] : null;
+
       const payload = {
-        video_id: videoId
+        video_url: yt_url
       };
       fetch('/video_transcript', {
         method: 'POST',
@@ -298,7 +299,11 @@
       else {
         buttletInstr = 'Please show summary in paragraph '
       }
-
+      if (fileText.trim() == 'Video duration should be less than 2 mint.'){
+        alert(fileText.trim())
+        return;
+      }
+      return;
       if (!fileText.trim()) {
         alert("File content is empty. Please upload a valid file.");
         return;
