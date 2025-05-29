@@ -159,6 +159,18 @@ def summarize_text_route():
     result = markdown_to_html(result)
     return jsonify({'result': result})
 
+
+
+# @app.route('/select_plan', methods=['POST'])
+# def select_plan():
+#     return render_template('select_plan.html')
+
+@app.route('/payment_page')
+def payment_page():
+    amount = request.args.get('amount', 0)
+    print(amount)
+    return render_template('payment.html', amount=amount)
+
 @app.route('/video_transcript', methods=['POST'])
 def video_transcript():
     data = request.get_json()

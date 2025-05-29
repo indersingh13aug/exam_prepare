@@ -15,50 +15,66 @@
             border-radius: 10px;
             display: inline-block;
         }
-        .btn {
-            padding: 12px 25px;
-            background-color: green;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: darkgreen;
-        }
+        .nav-buttons {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.btn-link {
+    display: inline-block;
+    margin: 0 10px;
+    padding: 8px 16px;
+    background-color: #FF4B2B;
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-link:hover {
+    background-color: #d63a20;
+}
+
+       
     </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+<div class="nav-buttons">
+    <a href="javascript:history.back()" class="btn-link">← Back</a>
+</div>
     <h1>Upgrade to Pro</h1>
     <p>Get unlimited transcriptions, priority support, and more.</p>
-
+    
     <div class="card">
-        <h2>Pro Plan - ₹299/month</h2>
+        <h2>Pro Plan - ₹99/month</h2>
         <p>Includes:</p>
         <ul style="text-align: left;">
             <li>✔ File uploads up to 1GB</li>
             <li>✔ 300 Questions Generate </li>
         </ul>
         <br>
-        <a href="https://rzp.io/l/your-payment-link" target="_blank">
-            <button class="btn">Pay Now</button>
-        </a>
+            <button class="btn" onclick="goToPayment(99)">Pay Now</button>
     </div>
 
     <div class="card">
-        <h2>Unlimited Plan - ₹999/month</h2>
+        <h2>Unlimited Plan - ₹299/month</h2>
         <p>Includes:</p>
         <ul style="text-align: left;">
             <li>✔ File uploads unlimited</li>
             <li>✔ Unlimited Questions Generate </li>
         </ul>
         <br>
-        <a href="https://rzp.io/l/your-payment-link" target="_blank">
-            <button class="btn">Pay Now</button>
-        </a>
+        <button class="btn" onclick="goToPayment(299)">Pay Now</button>
     </div>
 
+<script>
+
+function goToPayment(amount) {
+    window.location.href = `/payment_page?amount=${amount}`;
+}
+</script>
 </body>
 </html>
