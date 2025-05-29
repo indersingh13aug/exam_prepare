@@ -282,7 +282,6 @@
 
     function showSummary() {
       const summaryLimit = document.getElementById("summaryLimit").value
-
       wordLimit = 0
       if (summaryLimit == '') {
         wordLimit = 50
@@ -303,7 +302,6 @@
         alert(fileText.trim())
         return;
       }
-      return;
       if (!fileText.trim()) {
         alert("File content is empty. Please upload a valid file.");
         return;
@@ -471,6 +469,9 @@
     function clean(){
       document.getElementById('contentPreviewSum').value=''
       document.getElementById('contentPreviewQB').value=''
+      document.getElementById('wordCount').value=''
+      document.getElementById('summaryLimit').value=''
+      checkbox = document.getElementById('bulletpoints').checked=false;
       fileText=''
       fileTextqb=''
     }
