@@ -21,13 +21,19 @@
     Exam Preparation
     <i class="fas fa-right-from-bracket" title="Sign Out" onclick="signOut()"
       style="float:right; cursor:pointer; margin-right: 10px;"></i>
+
   </header>
 
   <nav>
     <button class="active" onclick="switchTab('summarize')">Summarization</button>
     <button onclick="switchTab('question')">Question Bank</button>
   </nav>
-
+  <div style="text-align: left;">
+        <button style="background-color: green; color: white; padding: 10px 20px; border-radius: 8px;"  onclick="redirectToUpgrade()" >
+            Upgrade to Pro 🔒
+        </button>
+    </a>
+  </div>
   <!-- Summarization Tab -->
   <div class="container" id="summarize-tab">
     <input type="radio" id="fileTabBtn" name="action" value="upload"><label for="upload">Upload File</label><input type="radio" id="videoTabBtn" name="action" value="insert"><label for="insert">Upload Video</label><br>
@@ -485,7 +491,9 @@
       fileText=''
       fileTextqb=''
     }
-  
+    function redirectToUpgrade() {
+        window.location.href = "final_payment.html"; // ✅ Redirect to new HTML page
+    }
   </script>
 
 </body>
