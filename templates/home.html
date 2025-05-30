@@ -407,11 +407,8 @@
       } else if (ext === "pdf") {
         fileText = await extractTextFromPDF(file);
       } else if (ext === "docx") {
-        alert();
         fileText = await extractTextFromDocx(file);
       }
-      alert(fileText);
-     
 
       document.getElementById("contentPreviewSum").value = fileText;
 
