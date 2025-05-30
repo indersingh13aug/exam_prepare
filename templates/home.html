@@ -28,15 +28,15 @@
     <button class="active" onclick="switchTab('summarize')">Summarization</button>
     <button onclick="switchTab('question')">Question Bank</button>
   </nav>
-  <div style="text-align: left;">
+  <!-- <div style="text-align: left;">
         <button style="background-color: green; color: white; padding: 10px 20px; border-radius: 8px;"  onclick="redirectToUpgrade()" >
             Upgrade to Pro 🔒
         </button>
     </a>
-  </div>
+  </div> -->
   <!-- Summarization Tab -->
   <div class="container" id="summarize-tab">
-    <input type="radio" id="fileTabBtn" name="action" value="upload"><label for="upload">Upload File</label><input type="radio" id="videoTabBtn" name="action" value="insert"><label for="insert">Upload Video</label><br>
+    <!-- <input type="radio" id="fileTabBtn" name="action" value="upload"><label for="upload">Upload File</label><input type="radio" id="videoTabBtn" name="action" value="insert"><label for="insert">Upload Video</label><br> -->
     <div id="fileSection">
       <div class="form-group">
         <label>Upload File</label>
@@ -45,13 +45,13 @@
       </div>
     </div>
     <!-- ✅ Video URL Section (Hidden by Default) -->
-    <div id="videoSection">
+    <!-- <div id="videoSection">
       <div class="form-group">
         <label>Video URL</label>
         <input type="text" id="videoUrl" placeholder="Enter YouTube video URL" />
         <button onclick="getYouTubeVideoID()">Load Video</button>
       </div>
-    </div>
+    </div> -->
     <div class="form-group">
       <label>Preview Content</label>
       <textarea id="contentPreviewSum" rows="5" readonly="true"></textarea>
@@ -91,7 +91,7 @@
 
 <!-- Question Bank Tab -->
   <div class="container hidden" id="question-tab">
-    <input type="radio" id="fileTabBtnqb" name="action" value="uploadqb"><label for="uploadqb">Upload File</label><input type="radio" id="videoTabBtnqb" name="action" value="insertqb"><label for="insert">Upload Video</label><br>
+    <!-- <input type="radio" id="fileTabBtnqb" name="action" value="uploadqb"><label for="uploadqb">Upload File</label><input type="radio" id="videoTabBtnqb" name="action" value="insertqb"><label for="insert">Upload Video</label><br> -->
     <div id="fileSectionqb">
       <div class="form-group">
         <label>Upload File</label>
@@ -100,13 +100,13 @@
       </div>
     </div>
     <!-- ✅ Video URL Section (Hidden by Default) -->
-    <div id="videoSectionqb">
+    <!-- <div id="videoSectionqb">
       <div class="form-group">
         <label>Video URL</label>
         <input type="text" id="videoUrlqb" placeholder="Enter YouTube video URL" />
         <button onclick="getYouTubeVideoIDqb()">Load Video</button>
       </div>
-    </div>
+    </div> -->
 
     <div class="form-group">
 
@@ -154,41 +154,41 @@
     });
 
     
-    const fileTabBtnqb = document.getElementById("fileTabBtnqb");
-    const videoTabBtnqb = document.getElementById("videoTabBtnqb");
-    const fileSectionqb = document.getElementById("fileSectionqb");
-    const videoSectionqb = document.getElementById("videoSectionqb");
-    fileSectionqb.classList.remove("hidden");
-    videoSectionqb.classList.add("hidden");
-    fileTabBtnqb.onclick = () => {
-      fileSectionqb.classList.remove("hidden");
-      videoSectionqb.classList.add("hidden");
-      clean();
-    };
+    // const fileTabBtnqb = document.getElementById("fileTabBtnqb");
+    // const videoTabBtnqb = document.getElementById("videoTabBtnqb");
+    // const fileSectionqb = document.getElementById("fileSectionqb");
+    // const videoSectionqb = document.getElementById("videoSectionqb");
+    // fileSectionqb.classList.remove("hidden");
+    // videoSectionqb.classList.add("hidden");
+    // fileTabBtnqb.onclick = () => {
+    //   fileSectionqb.classList.remove("hidden");
+    //   videoSectionqb.classList.add("hidden");
+    //   clean();
+    // };
 
-    videoTabBtnqb.onclick = () => {
-      videoSectionqb.classList.remove("hidden");
-      fileSectionqb.classList.add("hidden");
-      clean();
-    };
+    // videoTabBtnqb.onclick = () => {
+    //   videoSectionqb.classList.remove("hidden");
+    //   fileSectionqb.classList.add("hidden");
+    //   clean();
+    // };
 
-    const fileTabBtn = document.getElementById("fileTabBtn");
-    const videoTabBtn = document.getElementById("videoTabBtn");
-    const fileSection = document.getElementById("fileSection");
-    const videoSection = document.getElementById("videoSection");
-    fileSection.classList.remove("hidden");
-    videoSection.classList.add("hidden");
-    fileTabBtn.onclick = () => {
-      fileSection.classList.remove("hidden");
-      videoSection.classList.add("hidden");
-      clean();
-    };
+    // const fileTabBtn = document.getElementById("fileTabBtn");
+    // const videoTabBtn = document.getElementById("videoTabBtn");
+    // const fileSection = document.getElementById("fileSection");
+    // const videoSection = document.getElementById("videoSection");
+    // fileSection.classList.remove("hidden");
+    // videoSection.classList.add("hidden");
+    // fileTabBtn.onclick = () => {
+    //   fileSection.classList.remove("hidden");
+    //   videoSection.classList.add("hidden");
+    //   clean();
+    // };
 
-    videoTabBtn.onclick = () => {
-      videoSection.classList.remove("hidden");
-      fileSection.classList.add("hidden");
-      clean();
-    };
+    // videoTabBtn.onclick = () => {
+    //   videoSection.classList.remove("hidden");
+    //   fileSection.classList.add("hidden");
+    //   clean();
+    // };
 
     let isSpeaking = false;
     let utterance;
@@ -401,6 +401,7 @@
       const file = input.files[0];
       const wordCountDisplay = document.getElementById("wordCount");
       const summaryLimitInput = document.getElementById("summaryLimit");
+      
 
       if (!file) return;
 
@@ -416,8 +417,11 @@
       } else if (ext === "pdf") {
         fileText = await extractTextFromPDF(file);
       } else if (ext === "docx") {
+        alert();
         fileText = await extractTextFromDocx(file);
       }
+      alert(fileText);
+     
 
       document.getElementById("contentPreviewSum").value = fileText;
 
@@ -478,10 +482,16 @@
     }
 
     async function extractTextFromDocx(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer });
-      return result.value;
+       try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        return result.value;
+      } catch (error) {
+        console.error("Mammoth parsing error:", error);
+        return "Failed to extract text.";
+      }
     }
+    
     function clean(){
       document.getElementById('contentPreviewSum').value=''
       document.getElementById('contentPreviewQB').value=''
