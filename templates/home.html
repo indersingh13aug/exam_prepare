@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Exam Preparation</title>
+  <title>Smart Climb</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .speak-icon {
@@ -12,19 +12,31 @@
       height: 15px;
       cursor: pointer;
     }
+    .brand-name {
+      font-size: 48px;
+      color: #002d5f;
+      font-weight: bold;
+    }
+    .tagline {
+      font-size: 20px;
+      color: #555;
+      margin-top: 10px;
+    }
+
   </style>
 </head>
 
 <body>
 
   <header>
-    Exam Preparation
+
+
     <i class="fas fa-right-from-bracket" title="Sign Out" onclick="signOut()"
-      style="float:right; cursor:pointer; margin-right: 10px;"></i>
+      style="float:right; cursor:pointer; margin: 0px;"></i>
 
   </header>
 
-  <nav>
+  <nav style="align-items: center;">
     <button class="active" onclick="switchTab('summarize')">Summarization</button>
     <button onclick="switchTab('question')">Question Bank</button>
   </nav>

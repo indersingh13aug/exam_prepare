@@ -61,17 +61,29 @@ body {
 }
 
 header {
-    background-color: #FF416C;
+    /* background-color: #FF416C; */
     color: white;
-    padding: 1rem 2rem;
+    /* padding: 1rem 2rem; */
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 2.8rem;
     font-weight: bold;
-    box-shadow: 0 2px 6px rgba(245, 29, 29, 0.2);
+
+    background-image: url('./img/logo.jpg'); /* Replace with your logo path */
+      background-size: auto;
+      background-color: #f6f2f1;
+      background-position: center;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: end;
+      color: rgb(236, 133, 73);
+      /* text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); */
+
 }
 
 nav {
-    display: flex;
+    display: contents;
     justify-content: center;
     background-color: #FF416C;
     color: #FF416C;
@@ -85,10 +97,11 @@ nav button {
     font-size: 1rem;
     cursor: pointer;
     font-weight: 600;
+    color: silver;
 }
 
 nav button.active {
-    border-bottom: 3px solid #FF416C;
+    border-bottom: 3px solid #fe7600;
     color: #09051b;
 }
 
