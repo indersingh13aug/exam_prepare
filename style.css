@@ -92,16 +92,17 @@ header {
 nav {
     display: contents;
     justify-content: center;
+    width: 100%;
     background-color: #FF416C;
     color: #FF416C;
     border-bottom: 1px solid #ddd;
 }
 
 nav button {
-    padding: 1rem 2rem;
+    padding: .5rem .8rem;
     border: none;
     background: none;
-    font-size: 1rem;
+    font-size: .7rem;
     cursor: pointer;
     font-weight: 600;
     color: silver;
@@ -158,9 +159,9 @@ button {
     color: #FFFFFF;
     font-size: 12px;
     font-weight: bold;
-    padding: 10px 14px;
+    padding: 6px 14px;
     letter-spacing: 1px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     transition: transform 80ms ease-in;
     margin-top: -5px;
 }
