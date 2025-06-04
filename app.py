@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template, request, redirect, session, url_for, flash 
 # import whisper
+import wikipedia
 import docx
 import PyPDF2
 import requests
@@ -45,7 +46,7 @@ def init_db():
     """)
     # Add a test user (run once)
     cursor.execute("INSERT OR IGNORE INTO users (email, password) VALUES (?, ?)", 
-                   ("admin", "admin123"))
+                   ("admin", "admin1234"))
     conn.commit()
     conn.close()
 
@@ -159,7 +160,38 @@ def summarize_text_route():
     result = markdown_to_html(result)
     return jsonify({'result': result})
 
+# Step 2: Clean section headings like == Background ==
+def clean_wiki_text(text):
+    # Remove section headings like == Heading ==
+    cleaned_text = re.sub(r'=+[^=]+=+', '', text)
+    # Remove extra newlines and spaces
+    cleaned_text = re.sub(r'\n+', '\n', cleaned_text)
+    return cleaned_text.strip()
 
+@app.route('/wikipedia_search', methods=['POST'])
+def wikipedia_search():
+    data = request.get_json()
+    content = data.get("content", "")
+    wikipedia.set_lang("en")
+    try:
+        results = wikipedia.search(content)
+        if results:
+            page_title = results[0]
+            summary = wikipedia.summary(page_title, sentences=10)  # You can change number of sentences
+            cleaned_summary = clean_wiki_text(summary)
+            result=f"<strong>{page_title}</strong>':\n{cleaned_summary}"
+            result = markdown_to_html(result)
+        else:
+            result="No results found."
+    
+    except wikipedia.exceptions.DisambiguationError as e:
+        result = f"Disambiguation error. Choose a more specific query. Options:\n{e.options}"
+    except wikipedia.exceptions.PageError:
+        result = "Page not found."
+    except Exception as e:
+        result = f"An error occurred: {e}"
+
+    return jsonify({'result': result})
 
 @app.route('/video_transcript', methods=['POST'])
 def video_transcript():

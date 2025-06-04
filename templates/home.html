@@ -37,6 +37,7 @@
   <nav>
     <button class="active" onclick="switchTab('summarize')">Summarization</button>
     <button onclick="switchTab('question')">Question Bank</button>
+    <button onclick="switchTab('wikipedia')">WikiPedia</button>
   </nav>
 
   <!-- Summarization Tab -->
@@ -88,7 +89,7 @@
         <i id="copyIcon" class="fas fa-copy" title="Copy" style="cursor:pointer;"></i> &nbsp;
         <!-- Speak Icon -->
         <img id="speakIcon" src="https://img.icons8.com/ios-filled/50/speaker.png" class="speak-icon"
-          onclick="toggleSpeech()" alt="Speak">
+          onclick="toggleSpeech('summaryText')" alt="Speak">
       </div>
     </div>
 
@@ -141,6 +142,33 @@
     </div>
   </div>
 
+    <!-- WekiPedia Tab -->
+  <div class="container hidden" id="wikipedia-tab">
+    <!-- <input type="radio" id="fileTabBtn" name="action" value="upload"><label for="upload">Upload File</label><input type="radio" id="videoTabBtn" name="action" value="insert"><label for="insert">Upload Video</label><br> -->
+    <div id="wikipediaSection">
+      <div class="form-group">
+        <label>Enter Article</label>
+        <input id="articleInput" maxlength="100" />
+        <button onclick="showSearch()">Search</button>
+      </div>
+    </div>
+    <div id="loadingwikipedia" class="hidden">
+      <div class="spinner"></div> Searching is in progress...
+    </div>
+
+    <div id="wikipediaResult" class="result hidden">
+      <h3>Summary</h3>
+      <div id="wikipediaText">
+
+      </div>
+      <div style="padding-top: 10px;">
+        <i id="copyIcon" class="fas fa-copy" title="Copy" style="cursor:pointer;"></i> &nbsp;
+        <!-- Speak Icon -->
+        <img id="speakIcon" src="https://img.icons8.com/ios-filled/50/speaker.png" class="speak-icon"
+          onclick="toggleSpeech('wikipediaText')" alt="Speak">
+      </div>
+    </div>
+  </div>
 
   <!-- JS Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
@@ -198,8 +226,8 @@
     let isSpeaking = false;
     let utterance;
 
-    function toggleSpeech() {
-      const text = document.getElementById("summaryText").innerText;
+    function toggleSpeech(element) {
+      const text = document.getElementById(element).innerText;
 
       if (!isSpeaking) {
         // Start speaking
@@ -291,13 +319,48 @@
     }
 
     function switchTab(tab) {
+      clean();
       document.getElementById('summarize-tab').classList.toggle('hidden', tab !== 'summarize');
       document.getElementById('question-tab').classList.toggle('hidden', tab !== 'question');
-      clean();
+      document.getElementById('wikipedia-tab').classList.toggle('hidden', tab !== 'wikipedia');
+      
       const buttons = document.querySelectorAll('nav button');
       buttons.forEach(btn => btn.classList.remove('active'));
-      if (tab === 'summarize') buttons[0].classList.add('active');
-      else buttons[1].classList.add('active');
+      if (tab === 'summarize')
+       buttons[0].classList.add('active');
+      else if (tab === 'question')
+        buttons[1].classList.add('active');
+      else if (tab === 'wikipedia')
+        buttons[2].classList.add('active');
+    }
+    
+    function showSearch() {
+      const loading = document.getElementById('loadingwikipedia');
+      const keywords = document.getElementById('articleInput');
+      if (!keywords.value.trim()) {
+        alert("Please enter an article.");
+        return;
+      }
+      loading.classList.remove('hidden'); // Show loader
+      const payload = {
+        content: keywords.value
+      };
+      fetch('/wikipedia_search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('wikipediaText').innerHTML = data.result;
+          document.getElementById('wikipediaResult').classList.remove('hidden');
+        })
+        .catch(error => console.error(error))
+        .finally(() => {
+          loading.classList.add('hidden'); // Hide loader
+        });
     }
 
     function showSummary() {
